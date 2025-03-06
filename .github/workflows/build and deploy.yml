@@ -27,6 +27,6 @@ jobs:
       env:
         IMAGE_TAG: ${{ github.sha }}
       run: |
-        docker build -t ${{ vars.DOCKERHUB_USERNAME }}/weather-app:${{ IMAGE_TAG }} .
-        docker push ${{ vars.DOCKERHUB_USERNAME }}/weather-app:${{ IMAGE_TAG }}
+        docker build -t ${{ vars.DOCKERHUB_USERNAME }}/weather-app:${ IMAGE_TAG } .
+        docker push ${{ vars.DOCKERHUB_USERNAME }}/weather-app:${ IMAGE_TAG }
       
