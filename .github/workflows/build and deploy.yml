@@ -60,7 +60,7 @@ jobs:
       - name: Deploy Helm Chart
         shell: cmd
         run: |
-          helm upgrade --install weather-app charts/weather-app --set image.repository=${{ secrets.DOCKER_USERNAME }}/weather-app --set image.tag="${{ needs.build-and-push.outputs.IMAGE_TAG }}"
+          helm upgrade --install weather-app charts/weather-app --set image.repository=${{ secrets.DOCKERHUB_USERNAME }}/weather-app --set image.tag="${{ needs.build-and-push.outputs.IMAGE_TAG }}"
           kubectl get pods
           echo "${{ needs.build-and-push.outputs.IMAGE_TAG }}"
           sleep 50
