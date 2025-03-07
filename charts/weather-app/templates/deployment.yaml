@@ -21,9 +21,9 @@ spec:
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
-              containerPort: {{ .Values.service.port }}
+          - containerPort: {{ .Values.service.port }}
           livenessProbe:
-            {{- .Values.livenessProbe | nindent 12 }}
+            {{- toYaml .Values.livenessProbe | nindent 12 }}
           readinessProbe:
-            {{- .Values.readinessProbe | nindent 12 }}
+            {{- toYaml .Values.readinessProbe | nindent 12 }}
 
