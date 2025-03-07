@@ -8,10 +8,13 @@ on:
     branches:
       - main
   workflow_dispatch:
+
 jobs:
   build-and-push:
-    name: build and push Docker Image
+    name: Build and Push Docker Image
     runs-on: ubuntu-latest
+    outputs:
+      IMAGE_TAG: ${{ steps.set-image-tag.outputs.IMAGE_TAG }}  # Expose IMAGE_TAG to next job
 
     steps:
     - name: Code checkout
@@ -22,17 +25,20 @@ jobs:
       with:
         username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_TOKEN }}
-        
-    - name: Build and push the Docker image
+
+    - name: Set IMAGE_TAG
+      id: set-image-tag
+      run: echo "IMAGE_TAG=$(date +%s)" >> $GITHUB_ENV && echo "IMAGE_TAG=$(date +%s)" >> $GITHUB_OUTPUT  # Set output
+
+    - name: Build and Push Docker Image
       run: |
-        IMAGE_TAG=$(date +%s)
-        echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_ENV
-        docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/weather-app:${IMAGE_TAG} .
-        docker push ${{ secrets.DOCKERHUB_USERNAME }}/weather-app:${IMAGE_TAG}
+        docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/weather-app:${{ env.IMAGE_TAG }} .
+        docker push ${{ secrets.DOCKERHUB_USERNAME }}/weather-app:${{ env.IMAGE_TAG }}
+
     - name: Display IMAGE_TAG
       run: echo "IMAGE_TAG=${{ env.IMAGE_TAG }}"
 
-    
+
   Deploy-Helm:
     needs: build-and-push
     runs-on: self-hosted  # Uses self-hosted runner
@@ -41,17 +47,17 @@ jobs:
         uses: actions/checkout@v4  # Checks out the repository
 
       - name: Display IMAGE_TAG
-        run: echo "IMAGE_TAG=${{ env.IMAGE_TAG }}"
+        run: echo "IMAGE_TAG=${{ needs.build-and-push.outputs.IMAGE_TAG }}"
 
-      - name: Switch directory and run unitest
-        run: |
-          helm unittest charts/weather-app
+      - name: Switch directory and run unit test
+        run: helm unittest charts/weather-app
 
-      - name: Deploy and Delete Helm Chart
+      - name: Deploy Helm Chart
         shell: cmd
         run: |
-          helm upgrade --install weather-app charts/weather-app --set image.repository=${{ secrets.DOCKER_USERNAME }}/weather-app --set image.tag=$IMAGE_TAG
+          helm upgrade --install weather-app charts/weather-app --set image.repository=${{ secrets.DOCKER_USERNAME }}/weather-app --set image.tag=${{ needs.build-and-push.outputs.IMAGE_TAG }}
           kubectl get pods
-          echo "$IMAGE_TAG"
-          sleep 10
+          echo "${{ needs.build-and-push.outputs.IMAGE_TAG }}"
+          sleep 50
           kubectl get pods
+
