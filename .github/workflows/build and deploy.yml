@@ -48,7 +48,7 @@ jobs:
       - name: Deploy and Delete Helm Chart
         shell: cmd
         run: |
-          helm upgrade --install weather-app charts/weather-app --set image.repository=${{ secrets.DOCKER_USERNAME }}/weather-app --set image.tag=${IMAGE_TAG}
+          helm upgrade --install weather-app charts/weather-app --set image.repository=${{ secrets.DOCKER_USERNAME }}/weather-app --set image.tag=$IMAGE_TAG
           kubectl get pods
           sleep 30
           kubectl get pods
