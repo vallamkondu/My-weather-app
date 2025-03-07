@@ -46,7 +46,5 @@ jobs:
         run: |
           helm upgrade --install weather-app charts/weather-app --set image.repository=${{ secrets.DOCKER_USERNAME }}/weather-app --set image.tag=$IMAGE_TAG
           kubectl get pods
-          sleep 50
+          sleep 200
           kubectl get pods
-          minikube service weather-map
-          sleep 100
