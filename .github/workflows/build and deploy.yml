@@ -28,7 +28,10 @@ jobs:
 
     - name: Set IMAGE_TAG
       id: set-image-tag
-      run: echo "IMAGE_TAG=$(date +%s)" >> $GITHUB_ENV && echo "IMAGE_TAG=$(date +%s)" >> $GITHUB_OUTPUT  # Set output
+      run: |
+        IMAGE_TAG=$(date +%s)
+        echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_ENV
+        echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_OUTPUT
 
     - name: Build and Push Docker Image
       run: |
@@ -47,7 +50,9 @@ jobs:
         uses: actions/checkout@v4  # Checks out the repository
 
       - name: Display IMAGE_TAG
-        run: echo "IMAGE_TAG=${{ needs.build-and-push.outputs.IMAGE_TAG }}"
+        run: |
+          echo "Deploying with IMAGE_TAG=${{ needs.build-and-push.outputs.IMAGE_TAG }}"
+          
 
       - name: Switch directory and run unit test
         run: helm unittest charts/weather-app
@@ -55,7 +60,7 @@ jobs:
       - name: Deploy Helm Chart
         shell: cmd
         run: |
-          helm upgrade --install weather-app charts/weather-app --set image.repository=${{ secrets.DOCKER_USERNAME }}/weather-app --set image.tag=${{ needs.build-and-push.outputs.IMAGE_TAG }}
+          helm upgrade --install weather-app charts/weather-app --set image.repository=${{ secrets.DOCKER_USERNAME }}/weather-app --set image.tag="${{ needs.build-and-push.outputs.IMAGE_TAG }}"
           kubectl get pods
           echo "${{ needs.build-and-push.outputs.IMAGE_TAG }}"
           sleep 50
