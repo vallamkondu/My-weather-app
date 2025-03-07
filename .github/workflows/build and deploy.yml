@@ -36,13 +36,9 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4  # Checks out the repository
-        
-      - name: check minikube version
-        run: minikube status
 
       - name: Switch directory and run unitest
         run: |
-          pwd
           helm unittest charts/weather-app
 
       - name: Deploy and Delete Helm Chart
@@ -50,6 +46,7 @@ jobs:
         run: |
           helm upgrade --install weather-app charts/weather-app --set image.repository=${{ secrets.DOCKER_USERNAME }}/weather-app --set image.tag=$IMAGE_TAG
           kubectl get pods
-          sleep 30
+          sleep 50
           kubectl get pods
-          helm delete weather-app 
+          minikube service weather-map
+          sleep 100
