@@ -64,7 +64,7 @@ jobs:
       
       - name: Validate Packer Template
         working-directory: ./packer
-        run: packer validate -var-file=packer-vars.pkrvars.hcl packer-template.pkr.hcl
+        run: packer validate .
   
       - name: Format Packer Files
         working-directory: ./packer
