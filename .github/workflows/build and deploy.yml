@@ -8,6 +8,15 @@ on:
     branches:
       - main
   workflow_dispatch:
+    inputs:
+      deploy_helm:
+        description: "Run Helm Deployment?"
+        required: true
+        default: "yes"
+        type: choice
+        options:
+          - "yes"
+          - "no"
 
 jobs:
   build-and-push:
@@ -41,14 +50,27 @@ jobs:
     - name: Display IMAGE_TAG
       run: echo "IMAGE_TAG=${{ env.IMAGE_TAG }}"
 
+  packer_build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout code
+        uses: actions/checkout@v4
+
+      - name: Initialize Packer
+        run: packer init . && cd packer
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: eu-north-1
+      
+
+
 
   Deploy-Helm:
+    if: inputs.deploy_helm == 'yes'  # Run only if deploy_helm is 'yes'
     needs: build-and-push
     runs-on: self-hosted  # Uses self-hosted runner
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4  # Checks out the repository
-
       - name: Display IMAGE_TAG
         run: |
           echo "Deploying with IMAGE_TAG=${{ needs.build-and-push.outputs.IMAGE_TAG }}"
@@ -57,12 +79,4 @@ jobs:
       - name: Switch directory and run unit test
         run: helm unittest charts/weather-app
 
-      - name: Deploy Helm Chart
-        shell: cmd
-        run: |
-          helm upgrade --install weather-app charts/weather-app --set image.repository=${{ secrets.DOCKERHUB_USERNAME }}/weather-app --set image.tag="${{ needs.build-and-push.outputs.IMAGE_TAG }}"
-          kubectl get pods
-          echo "${{ needs.build-and-push.outputs.IMAGE_TAG }}"
-          sleep 50
-          kubectl get pods
 

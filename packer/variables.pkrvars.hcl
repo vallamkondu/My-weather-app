@@ -1,0 +1,7 @@
+docker_version  = "latest"
+buildah_version = "latest"
+kubectl_version = "latest"
+helm_version    = "latest"
+region          = "us-east-1"
+ami_name        = "Custom-Ubuntu-ami-2"
+instance_type = "t2.micro"
