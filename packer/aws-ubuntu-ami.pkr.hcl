@@ -1,3 +1,11 @@
+packer {
+  required_plugins {
+    amazon = {
+      source  = "hashicorp/amazon"
+      version = ">= 1.0.0"
+    }
+  }
+}
 
 
 source "amazon-ebs" "ubuntu" {
