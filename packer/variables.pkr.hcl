@@ -16,7 +16,7 @@ variable "helm_version" {
 }
 variable "region" {
     type = string
-    default = "us-east-1"
+    default = "eu-north-1"
 }
 variable "ami_name" {
     type = string
