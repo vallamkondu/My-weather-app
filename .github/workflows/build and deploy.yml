@@ -61,6 +61,18 @@ jobs:
         run: |
           pwd
           packer init .
+      
+      - name: Validate Packer Template
+        working-directory: ./packer
+        run: packer validate -var-file=packer-vars.pkrvars.hcl packer-template.pkr.hcl
+  
+      - name: Format Packer Files
+        working-directory: ./packer
+        run: packer fmt .
+  
+      - name: Build Packer Image
+        working-directory: ./packer
+        run: packer build .
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
