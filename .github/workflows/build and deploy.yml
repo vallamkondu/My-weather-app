@@ -113,7 +113,8 @@ jobs:
           terraform_version: latest
 
       - name: Debug Packer Output
-        run: echo "Packer Output: ${{ steps.build-packer.outputs.AMI_ID }}"
+        run: |
+          echo "Packer Output: ${{ needs.packer_build.outputs.AMI_ID }}"
         
 
       - name: Initialize Terraform
