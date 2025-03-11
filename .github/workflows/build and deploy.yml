@@ -81,7 +81,7 @@ jobs:
         id: build-packer
         working-directory: ./packer
         run: |
-          PACKER_OUTPUT=$(packer build -machine-readable -var-file=variables.pkrvars.hcl .)
+          PACKER_OUTPUT=$(packer build -machine-readable -var-file=variables.pkrvars.hcl . | tee packer_output.log)
           AMI_ID=$(echo "$PACKER_OUTPUT" | grep "artifact,0,id" | cut -d ',' -f6 | cut -d ':' -f2)
           echo "AMI_ID=$AMI_ID" >> $GITHUB_ENV
           echo "AMI_ID=$AMI_ID" >> $GITHUB_OUTPUT
@@ -100,9 +100,9 @@ jobs:
     needs: packer_build
     runs-on: ubuntu-latest
     env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_DEFAULT_REGION: eu-north-1
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_DEFAULT_REGION: eu-north-1
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
