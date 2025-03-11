@@ -1,5 +1,4 @@
 name: Build and deploy docker image in k8s
-
 on:
   push:
     branches:
@@ -52,6 +51,8 @@ jobs:
 
   packer_build:
     runs-on: ubuntu-latest
+    outputs:
+      AMI_ID: ${{ steps.build-packer.outputs.AMI_ID }}  #Exposing AMI_ID to next job
     steps:
       - name: checkout code
         uses: actions/checkout@v4
@@ -77,15 +78,47 @@ jobs:
         run: packer fmt .
   
       - name: Build Packer Image
+        id: build-packer
         working-directory: ./packer
-        run: packer build -var-file=variables.pkrvars.hcl .
+        run: |
+          PACKER_OUTPUT=$(packer build -machine-readable -var-file=variables.pkrvars.hcl .)
+          AMI_ID=$(echo "$PACKER_OUTPUT" | grep "artifact,0,id" | cut -d ',' -f6)
+          echo "AMI_ID=$AMI_ID" >> $GITHUB_ENV
+          echo "AMI_ID=$AMI_ID" >> $GITHUB_OUTPUT
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_DEFAULT_REGION: us-east-1
-      
+          AWS_DEFAULT_REGION: eu-north-1
 
+  terraform_deploy:
+    needs: packer_build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
 
+      - name: Install Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: latest
+
+      - name: Initialize Terraform
+        working-directory: ./terraform
+        run: terraform init
+
+      - name: Terraform plan
+        working-directory: ./terraform
+        run: terraform plan -var "ami_id=${{ needs.packer_build.outputs.AMI_ID }}"
+
+      - name: Apply Terraform
+        working-directory: ./terraform
+        run: |
+          terraform apply -auto-approve -var "ami_id=${{ needs.packer_build.outputs.AMI_ID }}"
+          terraform destroy --auto-approve
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: eu-north-1
 
   Deploy-Helm:
     if: inputs.deploy_helm == 'yes'  # Run only if deploy_helm is 'yes'
@@ -95,10 +128,17 @@ jobs:
       - name: Display IMAGE_TAG
         run: |
           echo "Deploying with IMAGE_TAG=${{ needs.build-and-push.outputs.IMAGE_TAG }}"
-          
 
-      - name: Switch directory and run unit test
+      - name: run unittest
         run: helm unittest charts/weather-app
-        # this is for testing
+        
+      - name: Deploy Helm Chart
+        shell: cmd
+        run: |
+          helm upgrade --install weather-app charts/weather-app --set image.repository=${{ secrets.DOCKERHUB_USERNAME }}/weather-app --set image.tag="${{ needs.build-and-push.outputs.IMAGE_TAG }}"
+          kubectl get pods
+          sleep 50
+          kubectl get pods
+
 
 
