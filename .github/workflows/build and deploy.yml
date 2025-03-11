@@ -85,6 +85,7 @@ jobs:
           AMI_ID=$(echo "$PACKER_OUTPUT" | grep "artifact,0,id" | cut -d ',' -f6 | cut -d ':' -f2)
           echo "AMI_ID=$AMI_ID" >> $GITHUB_ENV
           echo "AMI_ID=$AMI_ID" >> $GITHUB_OUTPUT
+          cat packer_output.log
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -93,7 +94,6 @@ jobs:
       - name: Debug Packer Output
         run: |
           echo "Full Packer Output:"
-          cat packer_output.log
           echo "Extracted AMI ID: ${{ env.AMI_ID }}"
 
   terraform_deploy:
