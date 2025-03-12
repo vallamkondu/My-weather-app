@@ -15,4 +15,9 @@ resource "aws_dynamodb_table" "weather_data" {
   tags = {
     Name = "WeatherDataTable"
   }
+
+  lifecycle {
+    prevent_destroy = false  # Allows deletion if necessary
+    ignore_changes  = [read_capacity, write_capacity]  # Ignores capacity changes
+  }
 }
