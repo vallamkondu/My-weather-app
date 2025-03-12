@@ -68,8 +68,12 @@ jobs:
         
 
   Deploy-Helm:
-    needs: build-and-push
+    needs: [build-and-push, terraform_deploy]
     runs-on: self-hosted  # Uses self-hosted runner
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_DEFAULT_REGION: ${{ secrets.AWS_REGION }}
     steps:
       - name: Display IMAGE_TAG
         run: |
@@ -79,9 +83,14 @@ jobs:
         run: helm unittest charts/weather-app
         
       - name: Deploy Helm Chart
-        shell: cmd
+        
         run: |
-          helm upgrade --install weather-app charts/weather-app --set image.repository=${{ secrets.DOCKERHUB_USERNAME }}/weather-app --set image.tag="${{ needs.build-and-push.outputs.IMAGE_TAG }}"
+          helm upgrade --install weather-app charts/weather-app \
+            --set image.repository=${{ secrets.DOCKERHUB_USERNAME }}/weather-app \
+            --set image.tag="${{ needs.build-and-push.outputs.IMAGE_TAG }}" \
+            --set env.AWS_ACCESS_KEY_ID="${{ secrets.AWS_ACCESS_KEY_ID }}" \
+            --set env.AWS_SECRET_ACCESS_KEY="${{ secrets.AWS_SECRET_ACCESS_KEY }}" \
+            --set env.AWS_DEFAULT_REGION="${{ secrets.AWS_REGION }}"
 
       - name: Wait for pods to be ready
         run: |

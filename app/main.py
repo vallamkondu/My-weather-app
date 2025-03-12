@@ -12,6 +12,12 @@ BASE_URL = "https://api.weatherbit.io/v2.0/current"
 AWS_REGION = "eu-north-1"
 TABLE_NAME = "WeatherData"
 
+session = boto3.Session(
+    aws_access_key_id=os.getenv("AWS_ACCESS_KEY_ID"),
+    aws_secret_access_key=os.getenv("AWS_SECRET_ACCESS_KEY"),
+    region_name=os.getenv("AWS_DEFAULT_REGION")
+)
+
 # Initialize DynamoDB
 dynamodb = boto3.resource("dynamodb", region_name=AWS_REGION)
 table = dynamodb.Table(TABLE_NAME)

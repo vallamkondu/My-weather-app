@@ -121,3 +121,9 @@ nodeSelector: {}
 tolerations: []
 
 affinity: {}
+
+env:
+  AWS_ACCESS_KEY_ID: "{{ .Values.awsAccessKeyId }}"
+  AWS_SECRET_ACCESS_KEY: "{{ .Values.awsSecretAccessKey }}"
+  AWS_DEFAULT_REGION: "{{ .Values.awsRegion }}"
+
