@@ -2,11 +2,17 @@ provider "aws" {
   region = "eu-north-1"
 }
 
-resource "aws_instance" "web" {
-  ami           = var.ami_id
-  instance_type = "t3.micro"
+resource "aws_dynamodb_table" "weather_data" {
+  name         = "WeatherData"
+  billing_mode = "PAY_PER_REQUEST"
+  hash_key     = "city"
+
+  attribute {
+    name = "city"
+    type = "S"
+  }
 
   tags = {
-    Name = "Custom-AMI-EC2"
+    Name = "WeatherDataTable"
   }
 }

@@ -1,4 +1,5 @@
 import requests
+import boto3
 from flask import Flask, render_template, request
 
 app = Flask(__name__)
@@ -6,6 +7,14 @@ app = Flask(__name__)
 # Weatherbit API Key
 API_KEY = "8403eb10edea448c94697ae6ac502186"
 BASE_URL = "https://api.weatherbit.io/v2.0/current"
+
+# AWS DynamoDB Configuration
+AWS_REGION = "eu-north-1"
+TABLE_NAME = "WeatherData"
+
+# Initialize DynamoDB
+dynamodb = boto3.resource("dynamodb", region_name=AWS_REGION)
+table = dynamodb.Table(TABLE_NAME)
 
 def get_weather(city):
     """Fetch weather data from Weatherbit API."""
@@ -16,7 +25,7 @@ def get_weather(city):
         data = response.json()
         if "data" in data and len(data["data"]) > 0:
             weather_info = data["data"][0]
-            return {
+            weather_data = {
                 "city": weather_info["city_name"],
                 "temperature": weather_info["temp"],
                 "description": weather_info["weather"]["description"],
@@ -24,10 +33,15 @@ def get_weather(city):
                 "wind_speed": weather_info["wind_spd"],
                 "icon": f"https://www.weatherbit.io/static/img/icons/{weather_info['weather']['icon']}.png"
             }
-        else:
-            return None
-    else:
-        return None
+            
+            # Store in DynamoDB
+            store_weather_data(weather_data)
+            return weather_data
+    return None
+
+def store_weather_data(weather_data):
+    """Store weather data in DynamoDB."""
+    table.put_item(Item=weather_data)
 
 @app.route("/", methods=["GET", "POST"])
 def index():
