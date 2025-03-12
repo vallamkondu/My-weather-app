@@ -123,7 +123,7 @@ tolerations: []
 affinity: {}
 
 env:
-  AWS_ACCESS_KEY_ID: "{{ .Values.awsAccessKeyId }}"
-  AWS_SECRET_ACCESS_KEY: "{{ .Values.awsSecretAccessKey }}"
-  AWS_DEFAULT_REGION: "{{ .Values.awsRegion }}"
+  AWS_ACCESS_KEY_ID: "AKIAS252VXVQUSW3GAXM"
+  AWS_SECRET_ACCESS_KEY: "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"
+  AWS_DEFAULT_REGION: "eu-north-1"
 
