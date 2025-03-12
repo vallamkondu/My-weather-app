@@ -54,7 +54,7 @@ jobs:
       - name: Initialize Packer
         working-directory: ./packer
         run: |
-          pwd
+          export PACKER_GITHUB_API_TOKEN=${{ secrets.PACKER_GITHUB_API_TOKEN }}
           packer init .
       
       - name: Validate Packer Template
