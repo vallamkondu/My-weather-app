@@ -7,15 +7,6 @@ on:
     branches:
       - main
   workflow_dispatch:
-    inputs:
-      deploy_helm:
-        description: "Run Helm Deployment?"
-        required: true
-        default: "yes"
-        type: choice
-        options:
-          - "yes"
-          - "no"
 
 jobs:
   build-and-push:
@@ -124,7 +115,6 @@ jobs:
         
 
   Deploy-Helm:
-    if: github.event.inputs.deploy_helm == 'yes'  # Run only if deploy_helm is 'yes'
     needs: build-and-push
     runs-on: self-hosted  # Uses self-hosted runner
     steps:
