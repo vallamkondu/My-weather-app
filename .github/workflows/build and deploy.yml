@@ -59,7 +59,9 @@ jobs:
 
       - name: Terraform plan
         working-directory: ./terraform
-        run: terraform plan
+        run: |
+          terraform import aws_dynamodb_table.weather_data WeatherData  
+          terraform plan
 
       - name: Apply Terraform
         working-directory: ./terraform
