@@ -10,17 +10,12 @@ API_KEY = "8403eb10edea448c94697ae6ac502186"
 BASE_URL = "https://api.weatherbit.io/v2.0/current"
 
 # AWS DynamoDB Configuration
-AWS_REGION = "eu-north-1"
+AWS_REGION = os.getenv("AWS_DEFAULT_REGION")
 TABLE_NAME = "WeatherData"
 
-session = boto3.Session(
-    aws_access_key_id=os.getenv("AWS_ACCESS_KEY_ID"),
-    aws_secret_access_key=os.getenv("AWS_SECRET_ACCESS_KEY"),
-    region_name=os.getenv("AWS_DEFAULT_REGION")
-)
-
-# Initialize DynamoDB
-dynamodb = boto3.resource("dynamodb", region_name=AWS_REGION)
+# Initialize boto3 session (uses credentials from env vars)
+session = boto3.Session()
+dynamodb = session.resource("dynamodb", region_name=AWS_REGION)
 table = dynamodb.Table(TABLE_NAME)
 
 def get_weather(city):
@@ -40,7 +35,6 @@ def get_weather(city):
                 "wind_speed": weather_info["wind_spd"],
                 "icon": f"https://www.weatherbit.io/static/img/icons/{weather_info['weather']['icon']}.png"
             }
-            
             # Store in DynamoDB
             store_weather_data(weather_data)
             return weather_data
