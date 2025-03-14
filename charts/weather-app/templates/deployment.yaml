@@ -20,13 +20,6 @@ spec:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
-          env:
-            - name: AWS_ACCESS_KEY_ID
-              value: {{ .Values.env.AWS_ACCESS_KEY_ID }}
-            - name: AWS_SECRET_ACCESS_KEY
-              value: {{ .Values.env.AWS_SECRET_ACCESS_KEY }}
-            - name: AWS_DEFAULT_REGION
-              value: {{ .Values.env.AWS_DEFAULT_REGION }}
           ports:
           - containerPort: {{ .Values.service.port }}
           livenessProbe:
