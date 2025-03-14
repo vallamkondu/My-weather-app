@@ -97,10 +97,10 @@ readinessProbe:
 
 #This section is for setting up autoscaling more information can be found here: https://kubernetes.io/docs/concepts/workloads/autoscaling/
 autoscaling:
-  enabled: false
-  minReplicas: 1
-  maxReplicas: 100
-  targetCPUUtilizationPercentage: 80
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 5
+  targetCPUUtilizationPercentage: 50
   # targetMemoryUtilizationPercentage: 80
 
 # Additional volumes on the output Deployment definition.
@@ -126,4 +126,10 @@ env:
   AWS_ACCESS_KEY_ID: "AKIAS252VXVQUSW3GAXM"
   AWS_SECRET_ACCESS_KEY: "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"
   AWS_DEFAULT_REGION: "eu-north-1"
+
+awsCredentials:
+  accessKeyId: "AKIAS252VXVQUSW3GAXM"
+  secretAccessKey: "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"
+  region: "eu-north-1"
+
 
