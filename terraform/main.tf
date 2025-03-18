@@ -83,7 +83,7 @@ resource "aws_route_table_association" "private_assoc" {
 
 # Security Group for EC2 - Allow SSH & HTTP from Internet
 resource "aws_security_group" "ec2_sg" {
-  vpc_id = aws_vpc.main_vpc.id
+  vpc_id = aws_vpc.vpc.id
   # Allow HTTP
   ingress {
     from_port   = 80
