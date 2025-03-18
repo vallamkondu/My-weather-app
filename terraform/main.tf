@@ -101,7 +101,7 @@ resource "aws_instance" "my_ec2" {
   ami             = data.aws_ami.latest_amazon_linux.id
   instance_type   = "t2.micro"
   subnet_id       = aws_subnet.public_subnets[0].id
-  security_groups = [aws_security_group.ec2_sg.name]
+  vpc_security_group_ids = [aws_security_group.ec2_sg.id]
 
   tags = merge(
     { "Name" = var.instance_name },
