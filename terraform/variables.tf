@@ -1,8 +1,3 @@
-variable "ami_id" {
-  description = "The AMI ID to use for the EC2 instance"
-  type        = string
-}
-
 variable "cidr_block" {
   description = "cidr block range"
   type = string
