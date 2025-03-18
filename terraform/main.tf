@@ -99,7 +99,7 @@ resource "aws_security_group" "ec2_sg" {
 # EC2 Instance
 resource "aws_instance" "my_ec2" {
   ami             = data.aws_ami.latest_amazon_linux.id
-  instance_type   = "t2.micro"
+  instance_type   = "t3.micro"
   subnet_id       = aws_subnet.public_subnets[0].id
   vpc_security_group_ids = [aws_security_group.ec2_sg.id]
 
