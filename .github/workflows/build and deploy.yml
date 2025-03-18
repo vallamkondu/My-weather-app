@@ -97,6 +97,7 @@ jobs:
         run: |
           sleep 30
           kubectl get pods
+          helm delete weather-app
 
 
 
