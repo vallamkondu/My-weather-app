@@ -16,6 +16,8 @@ spec:
         {{- include "weather-app.labels" . | nindent 8 }}
 
     spec:
+      imagePullSecrets:
+        - name: docker-secret
       containers:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
