@@ -8,14 +8,13 @@ spec:
 
   source:
     repoURL: https://github.com/vallamkondu/My-weather-app.git
-    targetRevision: HEAD
-    path: charts
-    chart: weather-app
+    targetRevision: main
+    path: charts/weather-app
     helm:
       values: |
         image:
           repository: "dikshit328/weather-app"
-          tag: "latest"
+          tag: "1742406829"
   destination: 
     server: https://kubernetes.default.svc
     namespace: default
