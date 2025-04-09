@@ -16,6 +16,11 @@ spec:
         {{- include "weather-app.labels" . | nindent 8 }}
 
     spec:
+      nodeSelector:
+        kubernetes.io/hostname: vkubelet
+      tolerations:
+        - key: "virtual-kubelet.io/provider"
+          operator: "Exists"
       imagePullSecrets:
         - name: docker-secret
       containers:
